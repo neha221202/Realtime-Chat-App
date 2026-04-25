@@ -21,7 +21,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.npvp.chatapp"
+      "package": "com.npvp.chatapp",
+      "softwareKeyboardLayoutMode": "adjustResize"
     },
     "web": {
       "favicon": "./assets/favicon.png"

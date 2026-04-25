@@ -21,8 +21,8 @@ export default function LoginScreen({ navigation }) {
         const data = await res.json();
         
         if (data.success) {
-          await AsyncStorage.setItem('currentUser', data.user.email);
-          navigation.replace('ChatList', { currentUser: data.user.email });
+          await AsyncStorage.setItem('currentUser', JSON.stringify(data.user));
+          navigation.replace('ChatList', { currentUser: data.user });
         } else {
           Alert.alert("Login Failed", data.error || "Wrong Credentials");
         }

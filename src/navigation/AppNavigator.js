@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { TouchableOpacity, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import InAppNotification from '../components/InAppNotification';
 
 // Import all screens
 import SplashScreen from '../screens/SplashScreen';
@@ -10,11 +11,23 @@ import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import ChatListScreen from '../screens/ChatListScreen';
 import ChatScreen from '../screens/ChatScreen';
+import UserSelectionScreen from '../screens/UserSelectionScreen';
+import NewGroupScreen from '../screens/NewGroupScreen';
+import GroupDetailsScreen from '../screens/GroupDetailsScreen';
+import GroupInfoScreen from '../screens/GroupInfoScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
+  const [currentNotification, setCurrentNotification] = useState(null);
+
+  // Set global function to show notification
+  global.showNotification = (msg) => {
+    setCurrentNotification(msg);
+  };
+
   return (
+    <>
     <Stack.Navigator 
       initialRouteName="Splash" 
       screenOptions={{ 
@@ -34,17 +47,10 @@ export default function AppNavigator() {
         name="ChatList" 
         component={ChatListScreen} 
         options={({ navigation }) => ({ 
-          title: 'User List',
-          headerLeft: () => null, // Removes accidental back arrows
-          headerRight: () => (
-            <TouchableOpacity onPress={async () => {
-               // Perform Logout Logic by resetting persistent save
-               await AsyncStorage.removeItem('currentUser');
-               navigation.replace('Login');
-            }} style={{ marginRight: 10 }}>
-              <Text style={{ color: '#EF4444', fontWeight: '700', fontSize: 16 }}>Logout</Text>
-            </TouchableOpacity>
-          )
+          title: 'My Chat',
+          headerStyle: { backgroundColor: '#4A90E2' },
+          headerTintColor: '#FFF',
+          headerLeft: () => null, 
         })} 
       />
       
@@ -52,15 +58,15 @@ export default function AppNavigator() {
         name="Chat" 
         component={ChatScreen} 
         options={({ route, navigation }) => ({ 
-          headerStyle: { backgroundColor: '#075E54' }, // Real WhatsApp Green color
+          headerStyle: { backgroundColor: '#4A90E2' },
           headerTintColor: '#fff',
           headerTitleAlign: 'left',
-          headerBackVisible: false, // Hides default to build a tight UI
+          headerBackVisible: false, 
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()} style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 2, marginRight: 8 }}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
-              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#E2E8F0', justifyContent: 'center', alignItems: 'center', marginLeft: 4 }}>
-                <Text style={{ color: '#075E54', fontSize: 18, fontWeight: 'bold' }}>
+              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center', marginLeft: 4 }}>
+                <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold' }}>
                   {(route.params?.username || 'U').charAt(0).toUpperCase()}
                 </Text>
               </View>
@@ -71,7 +77,6 @@ export default function AppNavigator() {
               <Text style={{ fontSize: 18, fontWeight: '600', color: '#fff' }} numberOfLines={1}>
                 {route.params?.username || 'User'}
               </Text>
-              <Text style={{ fontSize: 13, color: '#E0F2F1', fontWeight: '500', marginTop: -2 }}>online</Text>
             </View>
           ),
           headerRight: () => (
@@ -89,6 +94,31 @@ export default function AppNavigator() {
           )
         })} 
       />
+      <Stack.Screen 
+        name="UserSelection" 
+        component={UserSelectionScreen} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="NewGroup" 
+        component={NewGroupScreen} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="GroupDetails" 
+        component={GroupDetailsScreen} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen 
+        name="GroupInfo" 
+        component={GroupInfoScreen} 
+        options={{ headerShown: false }} 
+      />
     </Stack.Navigator>
+    <InAppNotification 
+        message={currentNotification} 
+        onHide={() => setCurrentNotification(null)} 
+    />
+    </>
   );
 }
